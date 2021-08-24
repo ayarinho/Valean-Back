@@ -1,0 +1,36 @@
+{
+  "name": "back",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon server"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.0",
+    "cloudinary": "^1.26.3",
+    "consola": "^2.15.3",
+    "cookie-parser": "^1.4.5",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "express-fileupload": "^1.2.1",
+    "express-handlebars": "^5.3.3",
+    "express-jwt": "^6.1.0",
+    "express-validator": "^6.12.1",
+    "google-auth-library": "^7.5.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.13.5",
+    "multer": "^2.0.0-rc.1",
+    "node-fetch": "^2.6.1",
+    "nodemailer": "^6.6.3",
+    "nodemon": "^2.0.12",
+    "twilio": "^3.66.1",
+    "validator": "^13.6.0",
+    "validatorjs": "^3.22.1"
+  }
+}
