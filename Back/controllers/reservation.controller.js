@@ -10,7 +10,9 @@ const ObjectID = require('mongoose').Types.ObjectId;  // les ID  sont reconnu pa
 
 exports.reservationController = async (req, res) => {
 
-    const { name, city, duration, email,idMachine,reserved } = req.body;
+    const { name, city, duration, email, idMachine, reserved, phoneNumber, typeOfRenting } = req.body;
+
+    console.log(req.body)
 
     const errors = validationResult(req);
 
@@ -24,16 +26,6 @@ exports.reservationController = async (req, res) => {
 
     } else {
 
-        /*Reservation.findOne({
-            email
-        }).exec((err, user) => {
-            if (user) {
-                return res.status(400).send({
-                    errors: 'Email is taken'
-                });
-            }
-        });*/
-
 
 
         const token = jwt.sign(
@@ -43,7 +35,9 @@ exports.reservationController = async (req, res) => {
                 duration,
                 city,
                 idMachine,
-                reserved
+                reserved,
+                typeOfRenting,
+                phoneNumber
             },
             process.env.JWT_ACCOUNT_ACTIVATION,
             {
@@ -107,7 +101,7 @@ exports.reservationController = async (req, res) => {
             }
         })
 
-    
+
 
     }
 };
@@ -129,23 +123,25 @@ exports.confirmReservation = (req, res) => {
             } else {
 
                 console.log(jwt.decode(token))
-                const { name, email, duration, city } = jwt.decode(token);
+                const { name, email, duration, city, typeOfRenting, phoneNumber } = jwt.decode(token);
 
-                const reserved='Active'
-               
+                const reserved = 'Active'
+
                 const reservation = new Reservation({
                     name,
                     email,
                     city,
                     duration,
+                    typeOfRenting,
                     reserved,
-                  
+                    phoneNumber
+
                 });
 
-                
+
 
                 reservation.save((err, user) => {
-                     
+
                     console.log(err)
 
                     if (err) {
@@ -172,7 +168,7 @@ exports.confirmReservation = (req, res) => {
 
 exports.addMachine = (req, res) => {
 
-    const { longitude, latitude, location } = req.body;
+    const { longitude, latitude, location, color } = req.body;
 
     const errors = validationResult(req);
 
@@ -190,7 +186,8 @@ exports.addMachine = (req, res) => {
         const machine = new Machine({
             longitude,
             latitude,
-            location
+            location,
+            color
 
 
         });
@@ -361,7 +358,15 @@ module.exports.addReservationToMachine = async (req, res) => {
 
             req.params.idMachine,
 
-            { $addToSet: { reservation:{id: req.body.id, name:req.body.name,reserved:req.body.reserved} } }, // najouti fel lista normalement 
+            {
+                $addToSet: {
+                    reservation: {
+                        id: req.body.id, name: req.body.name, reserved: req.body.reserved,
+                        typeOfRenting: req.body.typeOfRenting, city: req.body.city,
+                        phoneNumber: req.body.phoneNumber
+                    }
+                }
+            }, // najouti fel lista normalement 
             { new: true, upsert: true },
 
             (err, data) => {
@@ -385,3 +390,4 @@ module.exports.addReservationToMachine = async (req, res) => {
 
     }
 }
+

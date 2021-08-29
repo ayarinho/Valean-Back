@@ -5,7 +5,11 @@ const { isEmail } = require('validator');
 
 const AdminModel = new Schema({
 
+    userName: {
 
+        type: String,
+        required: true
+    },
 
     firstName: {
 
@@ -19,26 +23,45 @@ const AdminModel = new Schema({
         required: true
     },
 
+    location:{
+
+         type:String,
+         required:true
+    },
+
     email: {
         type: String,
         required: true,
-        validate: [isEmail],  // elle renvoie isEmail true si il est valid sinon elle renvoie false
-        lowercase: true,
-        unique: true,
-        trim: true,
+        
 
     },
 
     role: {
 
-        type: Date,
-        default: 'admin',
+        type: String,
+        default: 'Admin',
     },
 
     birthdate: {
 
         type: String,
-        require:true
+
+    },
+    
+    city: {
+
+        type: String,
+        required: true,
+
+
+
+    },
+    
+    country: {
+
+        type: String,
+        required: true,
+
 
     },
 
@@ -66,9 +89,12 @@ const AdminModel = new Schema({
         require:true 
 
     },
-}
+
+   }
 
 );
 
-module.exports = model("admin", AdminModel);
+
+
+module.exports = model("Admin", AdminModel);
 

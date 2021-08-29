@@ -7,26 +7,26 @@ const Reservation = new Schema({
 
     name: {
         type: String,
-        require: true
+       // require: true
 
     },
 
     city: {
 
         type: String,
-        require: true
+       // require: true
     },
 
     duration: {
 
         type: String,
-        require: true
+      //  require: true
 
     },
     email: {
 
         type: String,
-        require: true
+      //  require: true
 
     },
 
@@ -35,7 +35,21 @@ const Reservation = new Schema({
         type: String,
         default: 'Inactive',
         enum: ['Active', 'Inactive']
+    },
+
+    phoneNumber:{
+
+        type: String,
+       // require:true
+    },
+ 
+    typeOfRenting:{
+         
+        type:String,
+        default: 'Basic',
+        enum: ['Basic', 'Standard','Premium']
     }
+     
 
 
 

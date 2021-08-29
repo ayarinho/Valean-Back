@@ -6,15 +6,16 @@ const jwt = require('jsonwebtoken');
 const { errorHandler } = require('../helpers/dbErrorHandling');
 const nodemailer = require('nodemailer');
 const CollectionAgency = require('../models/CollectionAgency');
-const Reservation = require('../models/Reservation');
 const fetch = require('node-fetch')
-
-//const maxAge = 3 * 24 * 60 * 60 * 1000;
-
+const Admin = require('../models/Admin');
+const ObjectID = require('mongoose').Types.ObjectId;  // les ID  sont reconnu par la base de donner(verifier ID par rapport DB)
+const AdminModel = require('../models/Admin');
+const Machine = require('../models/Machine');
 
 
 exports.registerController = (req, res) => {
-    const { name, email, password, address, phoneNumber,role, logo } = req.body;
+
+    const { name, email, password, address, phoneNumber, role, logo } = req.body;
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
@@ -112,6 +113,7 @@ exports.registerController = (req, res) => {
     }
 };
 
+////////////////////////////////
 
 exports.activationController = (req, res) => {
 
@@ -130,10 +132,10 @@ exports.activationController = (req, res) => {
             } else {
 
                 console.log(jwt.decode(token))
-                const { name, email, password, address, phoneNumber,role, logo } = jwt.decode(token);
+                const { name, email, password, address, phoneNumber, role, logo } = jwt.decode(token);
 
-                console.log( CollectionAgency.role);
-               
+                console.log(CollectionAgency.role);
+
                 const collectionAgency = new CollectionAgency({
                     name,
                     email,
@@ -144,10 +146,10 @@ exports.activationController = (req, res) => {
                     logo
                 });
 
-                
+
 
                 collectionAgency.save((err, user) => {
-                     
+
                     console.log(err)
 
                     if (err) {
@@ -172,6 +174,7 @@ exports.activationController = (req, res) => {
     }
 };
 
+//////////////////////////
 
 exports.signinController = (req, res) => {
     const { email, password } = req.body;
@@ -185,11 +188,13 @@ exports.signinController = (req, res) => {
             errors: firstError
         });
     } else {
+
         // check if user exist
         CollectionAgency.findOne({
             email
         }).exec((err, user) => {
             if (err || !user) {
+
                 return res.status(400).json({
                     errors: 'User with that email does not exist. Please signup'
                 });
@@ -200,6 +205,7 @@ exports.signinController = (req, res) => {
                     errors: 'Email and password do not match'
                 });
             }
+
             // generate a token and send to client
             const token = jwt.sign(
                 {
@@ -210,7 +216,7 @@ exports.signinController = (req, res) => {
                     expiresIn: '7d'
                 }
             );
-            const { _id, name, email, role ,logo} = user;
+            const { _id, name, email, role, logo, isconnected, colorIsConnected } = user;
 
             return res.json({
                 token,
@@ -219,12 +225,18 @@ exports.signinController = (req, res) => {
                     name,
                     email,
                     role,
-                    logo
+                    logo,
+                    isconnected,
+                    colorIsConnected
                 }
             });
         });
+
     }
+
 };
+
+////////////////////////////
 
 exports.forgotPasswordController = (req, res) => {
     const { email } = req.body;
@@ -328,6 +340,7 @@ exports.forgotPasswordController = (req, res) => {
     }
 };
 
+///////////////////////////////
 
 exports.resetPasswordController = (req, res) => {
 
@@ -398,58 +411,58 @@ exports.resetPasswordController = (req, res) => {
 exports.facebookController = (req, res) => {
     console.log('FACEBOOK LOGIN REQ BODY', req.body);
     const { userID, accessToken } = req.body;
-  
+
     const url = `https://graph.facebook.com/v2.11/${userID}/?fields=id,name,email&access_token=${accessToken}`;
-  
+
     return (
-      fetch(url, {
-        method: 'GET'
-      })
-        .then(response => response.json())
-        // .then(response => console.log(response))
-        .then(response => {
-          const { email, name } = response;
-          CollectionAgency.findOne({ email }).exec((err, user) => {
-            if (user) {
-              const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
-                expiresIn: '7d'
-              });
-              const { _id, email, name, role } = user;
-              return res.json({
-                token,
-                user: { _id, email, name, role }
-              });
-            } else {
-              let password = email + process.env.JWT_SECRET;
-              user = new CollectionAgency({ name, email, password });
-              user.save((err, data) => {
-                if (err) {
-                  console.log('ERROR FACEBOOK LOGIN ON USER SAVE', err);
-                  return res.status(400).json({
-                    error: 'User signup failed with facebook'
-                  });
-                }
-                const token = jwt.sign(
-                  { _id: data._id },
-                  process.env.JWT_SECRET,
-                  { expiresIn: '7d' }
-                );
-                const { _id, email, name, role } = data;
-                return res.json({
-                  token,
-                  user: { _id, email, name, role }
+        fetch(url, {
+            method: 'GET'
+        })
+            .then(response => response.json())
+            // .then(response => console.log(response))
+            .then(response => {
+                const { email, name } = response;
+                CollectionAgency.findOne({ email }).exec((err, user) => {
+                    if (user) {
+                        const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+                            expiresIn: '7d'
+                        });
+                        const { _id, email, name, role } = user;
+                        return res.json({
+                            token,
+                            user: { _id, email, name, role }
+                        });
+                    } else {
+                        let password = email + process.env.JWT_SECRET;
+                        user = new CollectionAgency({ name, email, password });
+                        user.save((err, data) => {
+                            if (err) {
+                                console.log('ERROR FACEBOOK LOGIN ON USER SAVE', err);
+                                return res.status(400).json({
+                                    error: 'User signup failed with facebook'
+                                });
+                            }
+                            const token = jwt.sign(
+                                { _id: data._id },
+                                process.env.JWT_SECRET,
+                                { expiresIn: '7d' }
+                            );
+                            const { _id, email, name, role } = data;
+                            return res.json({
+                                token,
+                                user: { _id, email, name, role }
+                            });
+                        });
+                    }
                 });
-              });
-            }
-          });
-        })
-        .catch(error => {
-          res.json({
-            error: 'Facebook login failed. Try later'
-          });
-        })
+            })
+            .catch(error => {
+                res.json({
+                    error: 'Facebook login failed. Try later'
+                });
+            })
     );
-  };
+};
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT);
 
@@ -480,26 +493,26 @@ exports.googleController = (req, res) => {
                         const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
                             expiresIn: '7d'
                         });
-                        const { _id, email, name, role } = user;
+                        const { _id, email, name, role, isconnected, colorIsConnected } = user;
                         console.log('ahawaa user ', user)
 
                         return res.json({
                             token,
-                            user: { _id, email, name, role }
+                            user: { _id, email, name, role, colorIsConnected, isconnected }
                         });
 
 
                     }
 
 
-                    else {   
-                                                                // ken mùaandich menou fel base de donner nsajlou jawou behi ama password yetbadel
+                    else {
+                        // ken mùaandich menou fel base de donner nsajlou jawou behi ama password yetbadel
                         let password = email + process.env.JWT_SECRET;
 
-                      const  phoneNumber="26579007"
+                        const phoneNumber = "26579007"
 
-                        user = new CollectionAgency({ name, email, password ,phoneNumber});
-                         
+                        user = new CollectionAgency({ name, email, password, phoneNumber });
+
                         console.log(user)
 
                         user.save((err, data) => {
@@ -531,16 +544,264 @@ exports.googleController = (req, res) => {
 };
 
 exports.getAllUsers = (req, res) => {
-    
-CollectionAgency.find((err, data) => {
 
-    if (!err)
+    CollectionAgency.find((err, data) => {
 
-        return res.status(200).json(data);
+        if (!err)
 
-    else res.status(401).json({ err });
-});
+            return res.status(200).json(data);
+
+        else res.status(401).json({ err });
+    });
+
+}
+
+exports.addAdmin = async (req, res) => {
+
+    const { userName, firstName, lastName, email, address, phoneNumber, city, country, picture, password, role } = req.body
+
+    const admin = await Admin.create({
+
+        userName,
+        firstName,
+        lastName,
+        email,
+        address,
+        phoneNumber,
+        city,
+        country,
+        picture,
+        password,
+        role
+
+    });
+
+    admin.save((err, user) => {
+
+        console.log(err)
+
+        if (err) {
+            console.log('Save error', err.message);
+            return res.status(401).json({
+                errors: errorHandler(err)
+            });
+        } else {
+            return res.json({
+                success: true,
+                message: admin,
+                //message: 'Signup success'
+            });
+        }
+    });
+}
+
+
+exports.getAdmin = (req, res) => {
+
+    Admin.findOne({
+
+    }).exec((err, user) => {
+        if (user) {
+            return res.status(200).json({
+                message: user
+            });
+        }
+    });
+
+}
+
+exports.updateAdminProfile = async (req, res) => {
+
+    const { firstName, lastName, city, country, phoneNumber, address, userName, email } = req.body
+
+
+    if (!ObjectID.isValid(req.params.id))   // si lID est connu dans la base de donner
+
+        return res.status(400).send('ID unknown :' + req.params.id);
+
+    console.log(req.params.id)
+
+    try {
+
+        await Admin.findByIdAndUpdate(
+
+            req.params.id,
+
+            {
+                $set: {
+                    firstName: firstName, lastName: lastName, city: city, email: email, country: country,
+                    phoneNumber: phoneNumber, address: address, userName: userName
+                }
+            }, // najouti fel lista normalement 
+            { new: true, upsert: true },
+
+            (err, data) => {
+
+                if (!err)
+
+                    res.status(201).json(data);
+
+                else return res.status(500).json(err.message);
+
+            }
+
+        );
+
+
+
+
+    } catch (err) {
+
+        console.log(err)
+
+    }
 
 }
 
 
+
+exports.updateIsConnected = async (req, res) => {
+
+    const { isconnected, colorIsConnected } = req.body
+
+
+    if (!ObjectID.isValid(req.params.id))   // si lID est connu dans la base de donner
+
+        return res.status(400).send('ID unknown :' + req.params.id);
+
+    console.log(req.params.id)
+
+    try {
+
+        await CollectionAgency.findByIdAndUpdate(
+
+            req.params.id,
+
+            {
+                $set: {
+                    isconnected: isconnected, colorIsConnected: colorIsConnected
+                }
+            }, // najouti fel lista normalement 
+            { new: true, upsert: true },
+
+            (err, data) => {
+
+                if (!err)
+
+                    res.status(201).json(data);
+
+                else return res.status(500).json(err.message);
+
+            }
+
+        );
+
+
+
+
+    } catch (err) {
+
+        console.log(err)
+
+    }
+
+}
+
+//////////////////////////////////
+
+exports.deleteagencyCollection = async (req, res) => {
+
+    if (ObjectID.isValid(req.params.id)) {   // si lID est connu dans la base de donner
+
+        // return res.status(400).send('ID unknown :' + req.params.id);
+
+
+        await CollectionAgency.findByIdAndRemove(req.params.id);
+        res.send("deleted");
+    }
+    else res.send("not found");
+
+}
+
+
+///////////////////////////////////////////////
+
+
+exports.signinAdminController = (req, res) => {
+    const { email, password } = req.body;
+
+    const errors = validationResult(req);
+    console.log(errors)
+
+    if (!errors.isEmpty()) {                           // express-validator maantha ay haja hors eli hatitha enty
+        const firstError = errors.array().map(error => error.msg)[0];
+        return res.status(422).json({
+            errors: firstError
+        });
+    } else {
+
+        // check if user exist
+        AdminModel.findOne({
+            email
+        }).exec((err, user) => {
+            if (err || !user) {
+
+                return res.status(400).json({
+                    errors: 'Admin with that email does not exist. Please signup'
+                });
+            }
+
+
+            // generate a token and send to client
+            const token = jwt.sign(
+                {
+                    _id: user._id
+                },
+                process.env.JWT_SECRET,
+                {
+                    expiresIn: '7d'
+                }
+            );
+            const { _id, firstName, lastName, role, picture, city, country, address, phoneNumber, email, location } = user;
+
+            return res.json({
+                token,
+                user: {
+                    _id,
+                    firstName,
+                    email,
+                    role,
+                    lastName,
+                    city,
+                    country,
+                    address,
+                    phoneNumber,
+                    picture,
+                    location
+                }
+            });
+        });
+
+    }
+
+};
+
+///////////////////////////////////////
+
+exports.getMachineById = (req, res) => {
+
+    const id = req.params.id
+
+    console.log(id)
+
+    Machine.findById(id, function(err,docs){ 
+        
+        if (err){
+         
+        return res.json({message:err})
+    }
+    else{
+        return res.json({message:docs})
+    }
+});
+}

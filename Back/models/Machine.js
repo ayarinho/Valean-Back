@@ -25,6 +25,7 @@ const Machine = new Schema({
 
         type: String,
     },
+    
     color: {
 
         type: String,
@@ -35,12 +36,18 @@ const Machine = new Schema({
     reservation: {
 
         type: [
-            { 
-            id: String, 
-            name: String, 
-            reserved: String 
-           }
+            {
+                id: String,
+                name: String,
+                reserved: String
+            }
         ]
+    },
+
+    trash: {
+
+        type:[ {id:String, location: String, quantity: Number, state: String }],
+        //ref:'Trash'
     }
 
 }

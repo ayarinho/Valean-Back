@@ -57,7 +57,20 @@ const CollectionAgency = new Schema({
     machine: {
          
          type:[String]
-    }
+    },
+
+    isconnected:{
+          
+         type:String,
+         default:'inactive'
+          
+     },
+
+     colorIsConnected:{
+          
+           type:String,
+           default:'bg-danger'
+     }
 
 }
 
