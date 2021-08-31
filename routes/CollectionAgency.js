@@ -10,6 +10,7 @@ const { reservationController, addMachine, getAllMachine, addMachineToAgencyColl
      getReservation, getAllReservation, putMachineReserved, confirmReservation,
      addReservationToMachine } = require('../controllers/reservation.controller');
 const { addTrash, addTrashToMachine } = require('../controllers/trash.controller');
+const { getEmails } = require('../controllers/clientMessagerie.controller');
 const upload = multer();
 
 router.post('/register', validSign, registerController)
@@ -56,6 +57,9 @@ router.post('/upload', upload.single('file'), uploadProfil) // ki yabda fama 3 e
 router.post('/addTrash', addTrash);
 router.patch('/addTrashToMachine/:id', addTrashToMachine)
 
+//
+
+router.get('/getEmails',getEmails)
 
 
 module.exports = router;

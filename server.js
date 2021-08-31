@@ -17,6 +17,9 @@ app.use(fileUpload({
       
 }))
 
+process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0;
+
+
 const corsOptions = {
      origin: process.env.CLIENT_URL,
      credentials: true,

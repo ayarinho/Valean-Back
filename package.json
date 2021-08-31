@@ -24,6 +24,7 @@
     "express-jwt": "^6.1.0",
     "express-validator": "^6.12.1",
     "google-auth-library": "^7.5.0",
+    "imap": "^0.8.19",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.13.5",
     "multer": "^2.0.0-rc.1",
