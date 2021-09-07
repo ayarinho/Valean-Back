@@ -79,7 +79,7 @@ exports.reservationController = async (req, res) => {
             html: `
                   
             <h1>Please use the following to confirm  reservation</h1>
-            <p>https://node-heroku-deployement-test.herokuapp.com//reservation/confirm/${token}/${idMachine}</p>
+            <p>http://vallean-orange.herokuapp.com/reservation/confirm/${token}/${idMachine}</p>
             <hr />
             <img src='https://image.shutterstock.com/image-illustration/reservation-confirmed-red-rubber-stamp-260nw-499947085.jpg' style={{widh:'10px',height:'10px'}}/>
             <p>This email may containe sensetive information</p>
