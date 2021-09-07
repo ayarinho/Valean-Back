@@ -77,7 +77,7 @@ exports.registerController = (req, res) => {
             html: `
                   
             <h1>Please use the following to activate your account</h1>
-            <p>https://node-heroku-deployement-test.herokuapp.com/users/activate/${token}</p>
+            <p>http://vallean-orange.herokuapp.com/users/activate/${token}</p>
             <hr />
             <img src='http://res.cloudinary.com/orange112/image/upload/v1629673080/test/kdvf0jquwmqa8jcdtzwg.png' 
             style={{width:'30px',height:'30px'}}/>
@@ -288,7 +288,7 @@ exports.forgotPasswordController = (req, res) => {
                     subject: `Password Reset link`,
                     html: `
                     <h1>Please use the following link to reset your password</h1>
-                    <p>https://node-heroku-deployement-test.herokuapp.com/users/password/reset/${token}</p>
+                    <p>http://vallean-orange.herokuapp.com/users/password/reset/${token}</p>
                     <hr />
                     <p>This email may contain sensetive information</p>
                     <p>${process.env.CLIENT_URL}</p>
