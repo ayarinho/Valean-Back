@@ -17,7 +17,13 @@ const Reservation = new Schema({
        // require: true
     },
 
-    duration: {
+    startDate: {
+
+        type: String,
+      //  require: true
+
+    },
+    endDate: {
 
         type: String,
       //  require: true
@@ -48,6 +54,11 @@ const Reservation = new Schema({
         type:String,
         default: 'Basic',
         enum: ['Basic', 'Standard','Premium']
+    },
+    succesMessage:{
+      type:String,
+
+
     }
      
 

@@ -8,9 +8,19 @@ const CollectionAgency = require('../models/CollectionAgency');
 const ObjectID = require('mongoose').Types.ObjectId;  // les ID  sont reconnu par la base de donner(verifier ID par rapport DB)
 
 
+let transporter = nodemailer.createTransport({
+
+    service: 'gmail',
+    auth: {
+        user: process.env.USER_EMAIL,
+        pass: process.env.MDP_EMAIL
+    }
+
+});
+
 exports.reservationController = async (req, res) => {
 
-    const { name, city, duration, email, idMachine, reserved, phoneNumber, typeOfRenting } = req.body;
+    const { name, city, startDate, endDate, email, idMachine, reserved, phoneNumber, typeOfRenting } = req.body;
 
     console.log(req.body)
 
@@ -32,7 +42,8 @@ exports.reservationController = async (req, res) => {
             {
                 name,
                 email,
-                duration,
+                startDate,
+                endDate,
                 city,
                 idMachine,
                 reserved,
@@ -62,12 +73,12 @@ exports.reservationController = async (req, res) => {
         let mailOptions = {
 
             from: 'youssef.ayari1@esprit.tn',
-            to: email,
+            to: "youssef.ayari1@esprit.tn",
             subject: 'Reservation',
-            text: 'succefully reservation',
+            text: ' reservation',
             html: `
                   
-            <h1>Please use the following to confirm your reservation</h1>
+            <h1>Please use the following to confirm  reservation</h1>
             <p>${process.env.CLIENT_URL}/reservation/confirm/${token}/${idMachine}</p>
             <hr />
             <img src='https://image.shutterstock.com/image-illustration/reservation-confirmed-red-rubber-stamp-260nw-499947085.jpg' style={{widh:'10px',height:'10px'}}/>
@@ -96,8 +107,10 @@ exports.reservationController = async (req, res) => {
 
                 return res.status(200).json({
                     success: true,
-                    message: `Email has been sent to ${email}`
+                    message: `Email has been sent to admin to confirm your reservation`
                 });
+
+
             }
         })
 
@@ -109,6 +122,7 @@ exports.reservationController = async (req, res) => {
 exports.confirmReservation = (req, res) => {
 
     const { token } = req.body;
+
 
     if (token) {
 
@@ -122,19 +136,24 @@ exports.confirmReservation = (req, res) => {
 
             } else {
 
-                console.log(jwt.decode(token))
-                const { name, email, duration, city, typeOfRenting, phoneNumber } = jwt.decode(token);
+                console.log(jwt.decode(token));
+                const { name, email, startDate,
+                    endDate, city, typeOfRenting, phoneNumber } = jwt.decode(token);
 
-                const reserved = 'Active'
+                const reserved = 'Active';
+               const  succesMessage = `Success reservation from ${name}`;
+
 
                 const reservation = new Reservation({
                     name,
                     email,
                     city,
-                    duration,
+                    startDate,
+                    endDate,
                     typeOfRenting,
                     reserved,
-                    phoneNumber
+                    phoneNumber,
+                    succesMessage
 
                 });
 
@@ -150,6 +169,22 @@ exports.confirmReservation = (req, res) => {
                             errors: errorHandler(err)
                         });
                     } else {
+
+                        let mailOptions = {
+
+                            from: 'youssef.ayari1@esprit.tn',
+                            to: email,
+                            subject: 'Succefully Reservation',
+                            text: 'Succefully reservation',
+                            html: `
+                                  
+                            <p>Your reservation has been confirmed </p>
+                             
+                            `
+                        }
+                        transporter.sendMail(mailOptions, function (err, data) {
+                        })
+
                         return res.json({
                             success: true,
                             message: reservation,
@@ -228,6 +263,20 @@ module.exports.getAllMachine = (req, res) => {
 
 }
 
+
+module.exports.getAllReservation = (req, res) => {
+
+    Reserv.find((err, data) => {
+
+        if (!err)
+
+            return res.status(200).json(data);
+
+        else res.status(401).json({ err });
+    });
+
+}
+
 module.exports.addMachineToAgencyCollection = async (req, res) => {
 
 
@@ -283,18 +332,6 @@ exports.getReservation = (req, res) => {
 }
 
 
-exports.getAllReservation = (req, res) => {
-
-    Reservation.find((err, data) => {
-
-        if (!err)
-
-            return res.status(200).json(data);
-
-        else res.status(401).json({ err });
-    });
-
-}
 
 
 
