@@ -266,7 +266,7 @@ module.exports.getAllMachine = (req, res) => {
 
 module.exports.getAllReservation = (req, res) => {
 
-    Reserv.find((err, data) => {
+    Reservation.find((err, data) => {
 
         if (!err)
 
