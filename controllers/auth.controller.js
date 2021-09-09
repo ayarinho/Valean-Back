@@ -805,3 +805,51 @@ exports.getMachineById = (req, res) => {
     }
 });
 }
+
+
+
+exports.updateIsConnectedAdmin = async (req, res) => {
+
+
+
+    if (!ObjectID.isValid(req.params.id))   // si lID est connu dans la base de donner
+
+        return res.status(400).send('ID unknown :' + req.params.id);
+
+    const isConnected = "Active"
+
+    try {
+
+        await AdminModel.findByIdAndUpdate(
+
+            req.params.id,
+
+            {
+                $set: {
+                    isConnected: isConnected
+                }
+            }, // najouti fel lista normalement 
+            { new: true, upsert: true },
+
+            (err, data) => {
+
+                if (!err)
+
+                    res.status(201).json(data);
+
+                else return res.status(500).json(err.message);
+
+            }
+
+        );
+
+
+
+
+    } catch (err) {
+
+        console.log(err)
+
+    }
+
+}
