@@ -2,7 +2,7 @@
 const router = require('express').Router();
 const { registerController, activationController, signinController, forgotPasswordController, googleController,
      resetPasswordController, getAllUsers, facebookController, addAdmin, getAdmin, updateAdminProfile,
-     updateIsConnected, deleteagencyCollection, signinAdminController, getMachineById } = require('../controllers/auth.controller');
+     updateIsConnected, deleteagencyCollection, signinAdminController, getMachineById ,updateIsConnectedAdmin} = require('../controllers/auth.controller');
 const { validSign, validLogin, forgotPasswordValidator, resetPasswordValidator } = require('../helpers/valid');
 const { uploadProfil, uploadCloudinary, setPhotoCloudinary } = require('../controllers/upload.controller');
 const multer = require('multer');
@@ -60,6 +60,7 @@ router.patch('/addTrashToMachine/:id', addTrashToMachine)
 //
 
 router.get('/getEmails',getEmails)
+router.post('/updateIsConnectedAdmin/:id', updateIsConnectedAdmin)
 
 
 module.exports = router;
